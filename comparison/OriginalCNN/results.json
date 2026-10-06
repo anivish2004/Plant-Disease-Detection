@@ -1,0 +1,28 @@
+{
+  "model": "OriginalCNN",
+  "protocol_sha256": "494a6746e02074c7f0b2468fd1cf053ca229ae573db22a8ae7b2cef8ad9f9d44",
+  "validation": {
+    "accuracy": 0.5133472751875999,
+    "macro_precision": 0.43533430205032775,
+    "macro_recall": 0.5030223154205609,
+    "macro_f1": 0.44101467785046156,
+    "weighted_f1": 0.5190142226355667
+  },
+  "test": {
+    "accuracy": 0.5127321933817197,
+    "macro_precision": 0.4380350988388766,
+    "macro_recall": 0.49846919888438196,
+    "macro_f1": 0.44212985272392874,
+    "weighted_f1": 0.5200360568612861,
+    "loss": 1.5459647178649902
+  },
+  "epochs_completed": 22,
+  "best_epoch": 17,
+  "parameters": 62318,
+  "trainable_parameters": 62318,
+  "feature_extraction_seconds": 0.0,
+  "head_training_seconds": 2039.0222791300002,
+  "training_seconds": 2039.0222791300002,
+  "batch32_inference_ms_per_image": 0.5522257813481701,
+  "model_size_mb": 0.787664
+}

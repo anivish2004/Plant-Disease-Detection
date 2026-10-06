@@ -1,0 +1,28 @@
+{
+  "model": "DenseNet121",
+  "protocol_sha256": "494a6746e02074c7f0b2468fd1cf053ca229ae573db22a8ae7b2cef8ad9f9d44",
+  "validation": {
+    "accuracy": 0.9718292532906877,
+    "macro_precision": 0.965202353902911,
+    "macro_recall": 0.9692145648586494,
+    "macro_f1": 0.9670389113309795,
+    "weighted_f1": 0.9719075534125994
+  },
+  "test": {
+    "accuracy": 0.9758887932094968,
+    "macro_precision": 0.9665009120208533,
+    "macro_recall": 0.9713034056333091,
+    "macro_f1": 0.968762505550634,
+    "weighted_f1": 0.9759698355209667,
+    "loss": 0.08253753930330276
+  },
+  "epochs_completed": 27,
+  "best_epoch": 22,
+  "parameters": 7309670,
+  "trainable_parameters": 272166,
+  "feature_extraction_seconds": 1116.9524593769984,
+  "head_training_seconds": 150.40578245399956,
+  "training_seconds": 1101.5389133439985,
+  "batch32_inference_ms_per_image": 20.32105621867686,
+  "model_size_mb": 30.772565
+}

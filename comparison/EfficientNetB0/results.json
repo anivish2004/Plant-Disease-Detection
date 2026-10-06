@@ -1,0 +1,28 @@
+{
+  "model": "EfficientNetB0",
+  "protocol_sha256": "494a6746e02074c7f0b2468fd1cf053ca229ae573db22a8ae7b2cef8ad9f9d44",
+  "validation": {
+    "accuracy": 0.9692459097059909,
+    "macro_precision": 0.9603978737899121,
+    "macro_recall": 0.9631050838925339,
+    "macro_f1": 0.9615419583287207,
+    "weighted_f1": 0.9693085355272897
+  },
+  "test": {
+    "accuracy": 0.9744125968753844,
+    "macro_precision": 0.9661031708762544,
+    "macro_recall": 0.969054515678404,
+    "macro_f1": 0.9672199260849013,
+    "weighted_f1": 0.9744638997300027,
+    "loss": 0.08218973129987717
+  },
+  "epochs_completed": 20,
+  "best_epoch": 15,
+  "parameters": 4387273,
+  "trainable_parameters": 337702,
+  "feature_extraction_seconds": 413.9878686489992,
+  "head_training_seconds": 125.98135385500063,
+  "training_seconds": 479.7763436960013,
+  "batch32_inference_ms_per_image": 7.123139156249181,
+  "model_size_mb": 18.401666
+}

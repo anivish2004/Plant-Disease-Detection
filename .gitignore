@@ -1,0 +1,13 @@
+.venv/
+__pycache__/
+.ipynb_checkpoints/
+training_head_checkpoint.keras
+training_log.csv
+training_stdout.log
+.keras/
+.pip-cache/
+.pip-wheels/
+comparison/*/features/
+comparison_stdout.log
+.mpl-cache/
+comparison/*/training_checkpoint.keras
