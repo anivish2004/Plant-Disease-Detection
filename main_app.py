@@ -5,6 +5,7 @@ import numpy as np
 import streamlit as st
 import tensorflow as tf
 from PIL import Image, UnidentifiedImageError
+from model_architectures import MODEL_NAMES
 
 PROJECT_DIR = Path(__file__).resolve().parent
 
@@ -62,40 +63,41 @@ if view == "Model comparison":
         st.caption("Results are from one seeded experiment on held-out PlantVillage images. Training time excludes weight downloads; inference is measured in batches of 32.")
     st.stop()
 
-choices = {"Current deployed model": PROJECT_DIR}
-if comparison_dir.is_dir():
-    for directory in sorted(comparison_dir.iterdir()):
-        if directory.is_dir() and (directory / "plant_disease_model.keras").is_file() and (directory / "class_names.json").is_file():
-            choices[directory.name] = directory
-selection = st.sidebar.selectbox("Model", list(choices))
-directory = choices[selection]
-try:
-    model_path = directory / "plant_disease_model.keras"
-    metadata_path = directory / "class_names.json"
-    model, class_names, image_size = load_classifier(
-        str(directory), model_path.stat().st_mtime_ns, metadata_path.stat().st_mtime_ns)
-except (ValueError, OSError, KeyError) as error:
-    st.error(str(error))
-    st.stop()
-
-st.caption(f"Recognizes {len(class_names)} plant disease and healthy-leaf classes.")
+st.caption("Upload one leaf image to see predictions from all four models across 38 plant disease and healthy-leaf classes.")
 plant_image = st.file_uploader("Choose an image...", type=["jpg", "jpeg", "png"])
-if st.button("Predict disease"):
-    if plant_image is None:
-        st.warning("Choose a leaf image first.")
-    else:
-        try:
-            image = Image.open(plant_image).convert("RGB")
-        except (UnidentifiedImageError, OSError):
-            st.error("The uploaded file could not be read as an image.")
-            st.stop()
-        st.image(image)
-        # Match tf.image.resize used in training; rescaling is inside the model.
-        pixels = tf.image.resize(np.asarray(image), [image_size, image_size])
-        prediction = model.predict(tf.expand_dims(pixels, 0), verbose=0)[0]
-        index = int(np.argmax(prediction))
-        plant, condition = class_names[index].split("___", 1)
-        plant = plant.replace("_", " ")
-        condition = condition.replace("_", " ").strip()
-        st.subheader(f"{plant}: {condition}")
-        st.write(f"Model confidence: {prediction[index]:.1%}")
+if plant_image is not None:
+    try:
+        image = Image.open(plant_image).convert("RGB")
+    except (UnidentifiedImageError, OSError):
+        st.error("The uploaded file could not be read as an image.")
+        st.stop()
+    st.image(image)
+    rows = []
+    resized_images = {}
+    with st.spinner("Running all four models..."):
+        for name in MODEL_NAMES:
+            directory = comparison_dir / name
+            try:
+                model_path = directory / "plant_disease_model.keras"
+                metadata_path = directory / "class_names.json"
+                model, class_names, image_size = load_classifier(
+                    str(directory), model_path.stat().st_mtime_ns,
+                    metadata_path.stat().st_mtime_ns)
+                # Match training resize; each model contains its own normalization.
+                if image_size not in resized_images:
+                    pixels = tf.image.resize(np.asarray(image), [image_size, image_size])
+                    resized_images[image_size] = tf.expand_dims(pixels, 0)
+                prediction = model(resized_images[image_size], training=False).numpy()[0]
+                index = int(np.argmax(prediction))
+                plant, condition = class_names[index].split("___", 1)
+                rows.append({
+                    "Model": "Original repository CNN" if name == "OriginalCNN" else name,
+                    "Plant": plant.replace("_", " "),
+                    "Condition": condition.replace("_", " ").strip(),
+                    "Confidence": f"{prediction[index]:.1%}",
+                })
+            except (ValueError, OSError, KeyError, tf.errors.OpError) as error:
+                st.error(f"{name} could not produce a prediction: {error}")
+    if rows:
+        st.subheader("Predictions for your image")
+        st.dataframe(rows, hide_index=True)

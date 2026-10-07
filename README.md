@@ -116,8 +116,9 @@ image hashes, models, mappings, predictions, a CSV/JSON summary, a chart, and
 completed models. The preferred model is selected by **validation macro F1**;
 test scores are reported separately.
 
-In Streamlit, choose **Model comparison** in the sidebar to view results, or
-choose a trained model under **Predict** to try it on a leaf image.
+In Streamlit, choose **Model comparison** in the sidebar to view results. Under
+**Predict**, upload one leaf image to automatically see predictions from all four
+models together, including the predicted plant, condition, and confidence.
 
 Measured comparison (same 8,129 test images):
 
