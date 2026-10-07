@@ -1,4 +1,4 @@
-"""Compare the original CNN with three ImageNet encoders on identical splits."""
+"""Compare four ImageNet encoders on identical PlantVillage splits."""
 import argparse
 import csv
 import gc
@@ -187,7 +187,7 @@ def generate_report(results, config, output):
                "validation_macro_f1", "training_seconds", "batch32_inference_ms_per_image",
                "model_size_mb", "parameters", "epochs_completed"]
     with (output / "comparison_results.csv").open("w", newline="") as stream:
-        writer = csv.DictWriter(stream, fieldnames=columns)
+        writer = csv.DictWriter(stream, fieldnames=columns, lineterminator="\n")
         writer.writeheader()
         for result in results:
             writer.writerow({"model": result["model"],
@@ -215,8 +215,10 @@ def generate_report(results, config, output):
     report = ["# Four-model comparison", "", f"Preferred model by validation macro F1: **{best}**.", "",
               f"All models use the same {len(config['class_names'])}-class PlantVillage raw/color dataset and stratified image splits.",
               f"RGB images are resized to {config['image_size']} × {config['image_size']} for all models.",
-              f"OriginalCNN preserves the repository Conv32/Pool3/Conv16/Pool2/Flatten/Dense8 structure and trains from scratch, with {len(config['class_names'])} output classes. The prior input resolution was 256; this experiment uses the common resolution above.",
-              "The other three use frozen ImageNet encoders and a Dense(256)/Dropout(0.3) classification head.",
+              (f"OriginalCNN preserves the repository Conv32/Pool3/Conv16/Pool2/Flatten/Dense8 structure and trains from scratch, with {len(config['class_names'])} output classes. The prior input resolution was 256; this experiment uses the common resolution above."
+               if "OriginalCNN" in names else
+               "MobileNetV3Large replaces the original CNN baseline, which achieved 51.27% test accuracy. The historical baseline artifacts remain in OriginalCNN/."),
+              ("The pretrained models use frozen ImageNet encoders and a Dense(256)/Dropout(0.3) classification head."),
               f"Maximum {config['epochs']} epochs, Adam(0.001), inverse-frequency class weights, and identical early-stopping policies.", "",
               "| Model | Test accuracy | Test macro F1 | Validation macro F1 | Training minutes | Batch-32 ms/image | Size MB |",
               "|---|---:|---:|---:|---:|---:|---:|"]
@@ -224,9 +226,9 @@ def generate_report(results, config, output):
         report.append(f"| {r['model']} | {r['test']['accuracy']:.2%} | {r['test']['macro_f1']:.2%} | {r['validation']['macro_f1']:.2%} | {r['training_seconds']/60:.2f} | {r['batch32_inference_ms_per_image']:.2f} | {r['model_size_mb']:.2f} |")
     report += ["", "![Comparison](comparison_chart.png)", "",
                "Training timings are from this CPU and include train/validation feature extraction plus fitting, excluding test extraction, weight downloads, and model construction. Inference timing excludes image decoding and resizing.",
-               "This is one seeded comparison of a CNN trained from scratch versus frozen pretrained encoders at a common resolution, not a full fine-tuning or native-resolution benchmark.",
+               "This is one seeded comparison at a common resolution, not a full fine-tuning or native-resolution benchmark.",
                f"The test split contains {config['split_counts']['test']:,} images; scores describe held-out PlantVillage images, not field performance.",
-               "Model selection uses validation macro F1. The current deployed classifier is preserved; choose a comparison model in the app to try it.",
+               "Model selection uses validation macro F1. Upload one image in the app to see predictions from all four current models together.",
                "Saved split_manifest.csv fixes image membership and class order, and includes each image SHA256 for cache integrity."]
     (output / "comparison_report.md").write_text("\n".join(report) + "\n")
     return best
@@ -236,7 +238,7 @@ def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--dataset", type=Path, default=DEFAULT_DATASET)
     parser.add_argument("--output-dir", type=Path, default=PROJECT_DIR / "comparison")
-    parser.add_argument("--models", nargs="+", choices=MODEL_NAMES, default=list(MODEL_NAMES))
+    parser.add_argument("--models", nargs="+", choices=(*MODEL_NAMES, "OriginalCNN"), default=list(MODEL_NAMES))
     parser.add_argument("--epochs", type=int, default=30)
     parser.add_argument("--batch-size", type=int, default=32)
     parser.add_argument("--image-size", type=int, default=128)
@@ -271,7 +273,7 @@ def main():
               "optimizer": "Adam0.001", "early_stopping_patience": 5,
               "class_weights": "inverse_training_frequency"}
     results = []
-    # Run pretrained models first; the original CNN takes longer on CPU.
+    # The historical CNN is still available explicitly, after pretrained models.
     ordered_models = [name for name in args.models if name != "OriginalCNN"] + [name for name in args.models if name == "OriginalCNN"]
     for name in ordered_models:
         results.append(run_model(name, classes, splits, config, output))

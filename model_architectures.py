@@ -1,6 +1,6 @@
 """Serializable ImageNet encoders with their required RGB preprocessing."""
 
-MODEL_NAMES = ("OriginalCNN", "MobileNetV2", "EfficientNetB0", "DenseNet121")
+MODEL_NAMES = ("MobileNetV3Large", "MobileNetV2", "EfficientNetB0", "DenseNet121")
 
 
 def build_classifier(name, num_classes, image_size=128):
@@ -25,6 +25,10 @@ def build_classifier(name, num_classes, image_size=128):
         backbone = tf.keras.applications.MobileNetV2(**options)
         preprocessing = [layers.Rescaling(1 / 127.5, offset=-1)]
         normalization = "model_rescaling_1_over_127_5_minus_1"
+    elif name == "MobileNetV3Large":
+        backbone = tf.keras.applications.MobileNetV3Large(
+            **options, include_preprocessing=True)
+        normalization = "model_mobilenetv3_preprocessing"
     elif name == "EfficientNetB0":
         backbone = tf.keras.applications.EfficientNetB0(**options)
         normalization = "model_efficientnet_preprocessing"

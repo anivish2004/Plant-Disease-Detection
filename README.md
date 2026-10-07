@@ -96,7 +96,7 @@ Streamlit, Pillow, and Matplotlib. Training on CPU can take several hours.
 
 ## Compare four models
 
-Run the original repository CNN (retrained for 38 classes), MobileNetV2,
+Run MobileNetV3Large, MobileNetV2,
 EfficientNetB0, and DenseNet121 on the same dataset splits:
 
 ```bash
@@ -104,10 +104,11 @@ EfficientNetB0, and DenseNet121 on the same dataset splits:
 ```
 
 All models use 128 × 128 RGB images, the same stratified splits, class weights,
-and up to 30 epochs. The original CNN keeps its Conv32/Pool3/Conv16/Pool2/Flatten/
-Dense8 structure and trains from scratch; the other three use frozen pretrained
-encoders with a Dense256/Dropout0.3 head. This is a comparison of these training
-approaches at a shared resolution, not a full fine-tuning benchmark.
+and up to 30 epochs. All four use frozen ImageNet-pretrained encoders with a
+Dense256/Dropout0.3 head. Each model includes its required input normalization.
+This is a comparison at a shared resolution, not a full fine-tuning benchmark.
+MobileNetV3Large replaces the small CNN baseline, whose 38-class test accuracy
+was 51.27%. The historical CNN artifacts remain in `comparison/OriginalCNN/`.
 
 `Model_Comparison.ipynb` shows overall and per-class results, confusion matrices,
 and training curves. The `comparison/` folder saves the split manifest with
@@ -124,13 +125,14 @@ Measured comparison (same 8,129 test images):
 
 | Model | Test accuracy | Test macro F1 |
 |---|---:|---:|
-| Original repository CNN | 51.27% | 44.21% |
+| MobileNetV3Large | 97.50% | 96.74% |
 | MobileNetV2 | 96.86% | 96.06% |
 | EfficientNetB0 | 97.44% | 96.72% |
 | DenseNet121 | 97.59% | 96.88% |
 
-DenseNet121 also had the highest validation macro F1 and is the preferred model
-for this experiment. The original CNN stopped at 22 epochs; MobileNetV2 ran 30,
-EfficientNetB0 20, and DenseNet121 27, using the shared early-stopping rule.
+MobileNetV3Large had the highest validation macro F1 (96.84%) and is the preferred
+model for this experiment. It stopped at 21 epochs with the best checkpoint from
+epoch 16; MobileNetV2 ran 30, EfficientNetB0 20, and DenseNet121 27, using the
+shared early-stopping rule. DenseNet121 had the highest reported test accuracy.
 See [the full comparison report](comparison/comparison_report.md) for measured
 runtime, inference speed, artifact sizes, and the experiment's scope.

@@ -1,0 +1,28 @@
+{
+  "model": "MobileNetV3Large",
+  "protocol_sha256": "494a6746e02074c7f0b2468fd1cf053ca229ae573db22a8ae7b2cef8ad9f9d44",
+  "validation": {
+    "accuracy": 0.9740435477918563,
+    "macro_precision": 0.9682325932964401,
+    "macro_recall": 0.9688228665746867,
+    "macro_f1": 0.9683878583739517,
+    "weighted_f1": 0.9739836424292648
+  },
+  "test": {
+    "accuracy": 0.9750276786812646,
+    "macro_precision": 0.9672302621419607,
+    "macro_recall": 0.9679616205959959,
+    "macro_f1": 0.9674326915409929,
+    "weighted_f1": 0.9749805797641536,
+    "loss": 0.0848403051495552
+  },
+  "epochs_completed": 21,
+  "best_epoch": 16,
+  "parameters": 3252134,
+  "trainable_parameters": 255782,
+  "feature_extraction_seconds": 147.59762568199994,
+  "head_training_seconds": 88.17491781800027,
+  "training_seconds": 212.93882429500036,
+  "batch32_inference_ms_per_image": 2.66057565625033,
+  "model_size_mb": 13.702733
+}
