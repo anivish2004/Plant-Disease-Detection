@@ -94,7 +94,7 @@ if plant_image is not None:
                 index = int(np.argmax(prediction))
                 plant, condition = class_names[index].split("___", 1)
                 rows.append({
-                    "Model": "Original repository CNN" if name == "OriginalCNN" else name,
+                    "Model": "CNN" if name == "OriginalCNN" else name,
                     "Plant": plant.replace("_", " "),
                     "Condition": condition.replace("_", " ").strip(),
                     "Confidence": f"{float(prediction[index]) * 100}%",
