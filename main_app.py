@@ -94,7 +94,7 @@ if plant_image is not None:
                     "Model": "Original repository CNN" if name == "OriginalCNN" else name,
                     "Plant": plant.replace("_", " "),
                     "Condition": condition.replace("_", " ").strip(),
-                    "Confidence": f"{prediction[index]:.1%}",
+                    "Confidence": f"{float(prediction[index]) * 100}%",
                 })
             except (ValueError, OSError, KeyError, tf.errors.OpError) as error:
                 st.error(f"{name} could not produce a prediction: {error}")
