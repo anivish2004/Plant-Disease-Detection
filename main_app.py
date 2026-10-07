@@ -68,7 +68,10 @@ plant_image = st.file_uploader("Choose an image...", type=["jpg", "jpeg", "png"]
 if plant_image is not None:
     try:
         image = Image.open(plant_image).convert("RGB")
-    except (UnidentifiedImageError, OSError):
+        # Use the training decoder for inference; JPEG decoders can differ.
+        decoded_image = tf.io.decode_image(
+            plant_image.getvalue(), channels=3, expand_animations=False)
+    except (UnidentifiedImageError, OSError, tf.errors.OpError):
         st.error("The uploaded file could not be read as an image.")
         st.stop()
     st.image(image)
@@ -85,7 +88,7 @@ if plant_image is not None:
                     metadata_path.stat().st_mtime_ns)
                 # Match training resize; each model contains its own normalization.
                 if image_size not in resized_images:
-                    pixels = tf.image.resize(np.asarray(image), [image_size, image_size])
+                    pixels = tf.image.resize(decoded_image, [image_size, image_size])
                     resized_images[image_size] = tf.expand_dims(pixels, 0)
                 prediction = model(resized_images[image_size], training=False).numpy()[0]
                 index = int(np.argmax(prediction))
